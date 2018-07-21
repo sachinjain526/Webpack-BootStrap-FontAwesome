@@ -16,6 +16,11 @@ module.exports = {
   module: {// here we will load some external resource. which we are using to build our project
     rules: [
       {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "eslint-loader",
+      },
+      {
         test: /\.js$/,// it will find all js 
         use: "babel-loader",// which will perform some functioanlity during build process.
         exclude: path.resolve(__dirname, "node_modules")// expect this 
@@ -28,7 +33,7 @@ module.exports = {
         }, {
           loader: "sass-loader"
         }],
-		exclude: path.resolve(__dirname, "node_modules")// expect this 
+        exclude: path.resolve(__dirname, "node_modules")// expect this 
       }
     ]
   },
