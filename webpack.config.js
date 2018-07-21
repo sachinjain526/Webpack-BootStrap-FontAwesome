@@ -28,12 +28,52 @@ module.exports = {
         test: /\.scss$/,
         use: [{
           loader: "style-loader"
-        }, {
+        },
+        {
           loader: "css-loader"
-        }, {
+        },
+        {
+          loader: 'postcss-loader',
+          options: {
+            plugins: function () {
+              return [
+                require('autoprefixer')
+              ];
+            }
+          }
+        },
+        {
           loader: "sass-loader"
         }],
         exclude: path.resolve(__dirname, "node_modules")// expect this 
+      },
+      {
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "url-loader?limit=10000&mimetype=application/font-woff",
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'fonts/'
+        }
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "file-loader",
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'fonts/'
+        }
+      },
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'assets/'
+            }
+          }
+        ]
       }
     ]
   },
