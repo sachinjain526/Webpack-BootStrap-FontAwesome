@@ -1,95 +1,84 @@
-var path = require('path');
-var webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require('path');
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+
 module.exports = {
-  mode: "development",
+  mode: 'development',
   watch: true,
-  resolve: {
-    extensions: ['.js', '.scss']
-  },
-  entry: "./app/js/main.js",// it can be multiple file. For multiple file use array with proper path
+  entry: ['./src/js/main.js'], // it can be multiple file. For multiple file use array with proper path
   output: {// this is for output where you want to put your file after complete build process
-    path: path.resolve(__dirname, "dist"),
-    filename: "bundle.js"
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
   },
   module: {// here we will load some external resource. which we are using to build our project
     rules: [
       {
-        test: /\.js$/,// it will find all js 
-        use: "babel-loader",// which will perform some functioanlity during build process.
-        exclude: path.resolve(__dirname, "node_modules")// expect this 
+        test: /\.js$/, // it will find all js
+        use: 'babel-loader', // which will perform some functioanlity during build process.
+        exclude: [/node_modules/, /dist/], // expect this
       },
       {
         test: /\.js$/,
-        exclude: [/node_modules/, /dist/],
-        loader: "eslint-loader",
+        include: [/src/, /tests/],
+        loader: 'eslint-loader',
+        options: {
+          //fix: true
+        }
+
       },
       {
         test: /\.scss$/,
         use: [{
-          loader: "style-loader"
-        },
-        {
-          loader: "css-loader"
-        },
-        {
-          loader: 'postcss-loader',
-          options: {
-            plugins: function () {
-              return [
-                require('autoprefixer')
-              ];
-            }
-          }
-        },
-        {
-          loader: "sass-loader"
-        }],
-        exclude: path.resolve(__dirname, "node_modules")// expect this 
+          loader: 'style-loader'
+        }, {
+          loader: 'css-loader'
+        }, {
+          loader: 'sass-loader'
+        }]
       },
+      // Font-awesome 4.7.X
       {
-        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: "url-loader?limit=10000&mimetype=application/font-woff",
-        options: {
-          name: '[name].[ext]',
-          outputPath: 'fonts/'
-        }
+        test: /\.(ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
+        loader: 'file-loader?name=fonts/[name].[ext]',
+        include: [/font-awesome/],
       },
+      // Font-awesome 5.X
       {
-        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: "file-loader",
-        options: {
-          name: '[name].[ext]',
-          outputPath: 'fonts/'
-        }
+        test: /\.(ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
+        loader: 'file-loader?name=fonts/[name].[ext]',
+        exclude: [/font-awesome/],
       },
       {
         test: /\.(png|jpg|gif)$/,
-        use: [
-          {
-            loader: 'file-loader',
-            options: {
-              name: '[name].[ext]',
-              outputPath: 'assets/'
-            }
-          }
-        ]
-      }
-    ]
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          outputPath: 'assets/',
+        },
+      },
+    ],
   },
   plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery',
+      'window.$': 'jquery',
+      'window.jQuery': 'jquery',
+    }),
     new CopyWebpackPlugin([{
-      from: './app/assets',
-      to: 'assets'
+      from: './src/assets',
+      to: 'assets',
     }]),
     new HtmlWebpackPlugin({
-      template: "./app/index.html",
-      chunksSortMode: 'dependency'
-    })
+      template: './src/index.html',
+      chunksSortMode: 'dependency',
+    }),
+    new CleanWebpackPlugin(['dist']),
   ],
   devServer: {
-    contentBase: path.join(__dirname, "dist"),
+    contentBase: path.join(__dirname, 'dist'),
     compress: true,
     port: 5000,
     proxy: {
@@ -99,4 +88,4 @@ module.exports = {
       }
     }
   }
-}
+};
